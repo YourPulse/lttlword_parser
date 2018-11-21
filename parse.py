@@ -22,6 +22,8 @@ def get_stats(html):
     stats = li.find_all('strong')[1].text
     return stats
 
+
+
 def parse(html):
     soup = BeautifulSoup(html)
     main_div = soup.find('div', id = "main")
@@ -33,16 +35,17 @@ def parse(html):
         articles = row.find_all('article')
         for article in articles:
             mods.append({
-                'mod_name': article.header.div.h2.a.text, 
-                'discription': get_discription(get_html(article.header.div.h2.a['href'])),
-                #'date': ,
-                'rating': get_stats(get_html(article.header.div.h2.a['href'])) + ' из 5',
+                'mod_name':     article.header.div.h2.a.text, 
+                'tags':         [tag.text for tag in article.header.find('div', class_ = 'meta_tags').p.find_all('a')],
+                'discription':  get_discription(get_html(article.header.div.h2.a['href'])),
+                'date':         article.header.li.time.text,
+                'rating':       get_stats(get_html(article.header.div.h2.a['href'])) + ' из 5',
             }) 
     for mod in mods:
         print(mod)
 
 def main():
-    parse(get_html("http://lttlword.ru/tag/rimworld-v1/"))
+    parse(get_html("http://lttlword.ru/category/rimworld/mody"))
 
 if __name__ == '__main__':
     main()

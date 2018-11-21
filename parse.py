@@ -6,6 +6,13 @@ def get_html(url):
     response = urlopen(req)
     return response.read()
 
+def get_discription(html):
+    soup = BeautifulSoup(html)
+    main_div = soup.find('div', id = "main")
+    section = main_div.find('section', class_='post_content')
+    disc = section.find('p').text
+    return disc
+
 def parse(html):
     soup = BeautifulSoup(html)
     main_div = soup.find('div', id = "main")
@@ -17,10 +24,11 @@ def parse(html):
         articles = row.find_all('article')
         for article in articles:
             mods.append({
-                'mod_name': article.header.div.h2.a.text 
-
-            })
-    print(mods)
+                'mod_name': article.header.div.h2.a.text, 
+                'discription': get_discription(get_html(article.header.div.h2.a['href']))
+            }) 
+    for mod in mods:
+        print(mod)
 
 def main():
     parse(get_html("http://lttlword.ru/tag/rimworld-v1/"))

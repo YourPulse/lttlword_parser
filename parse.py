@@ -13,6 +13,15 @@ def get_discription(html):
     disc = section.find('p').text
     return disc
 
+def get_stats(html):
+    soup = BeautifulSoup(html)
+    main_div = soup.find('div', id = "main")
+    li = main_div.find('ul', class_="meta text-muted list-inline meta_lttl").find('li', style="vertical-align: text-bottom;").find('em')
+    if int(li.find('strong').text)==0:
+        return 'Пока нет оценок'
+    stats = li.find_all('strong')[1].text
+    return stats
+
 def parse(html):
     soup = BeautifulSoup(html)
     main_div = soup.find('div', id = "main")
@@ -25,7 +34,9 @@ def parse(html):
         for article in articles:
             mods.append({
                 'mod_name': article.header.div.h2.a.text, 
-                'discription': get_discription(get_html(article.header.div.h2.a['href']))
+                'discription': get_discription(get_html(article.header.div.h2.a['href'])),
+                #'date': ,
+                'rating': get_stats(get_html(article.header.div.h2.a['href'])) + ' из 5',
             }) 
     for mod in mods:
         print(mod)

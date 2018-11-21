@@ -62,7 +62,7 @@ def main():
     max_page = get_page(get_html("http://lttlword.ru/category/rimworld/mody"))
     mods = []
     print('Всего страниц найдено: {}'.format(max_page))
-    for page in range(1, 3):
+    for page in range(1, max_page):
         print("Парсинг {}%".format(page  / max_page * 100))
         mods.extend(parse(get_html("http://lttlword.ru/category/rimworld/mody/page/" + str(page))))
     

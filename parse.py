@@ -1,5 +1,6 @@
 from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup
+import csv
 
 def get_html(url):
     req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -7,14 +8,14 @@ def get_html(url):
     return response.read()
 
 def get_discription(html):
-    soup = BeautifulSoup(html)
+    soup = BeautifulSoup(html, features="html5lib")
     main_div = soup.find('div', id = "main")
     section = main_div.find('section', class_='post_content')
     disc = section.find('p').text
     return disc
 
 def get_stats(html):
-    soup = BeautifulSoup(html)
+    soup = BeautifulSoup(html, features="html5lib")
     main_div = soup.find('div', id = "main")
     li = main_div.find('ul', class_="meta text-muted list-inline meta_lttl").find('li', style="vertical-align: text-bottom;").find('em')
     if int(li.find('strong').text)==0:
@@ -23,14 +24,14 @@ def get_stats(html):
     return stats
 
 def get_page(html):
-    soup = BeautifulSoup(html)
+    soup = BeautifulSoup(html, features="html5lib")
     main_div = soup.find('div', id = "main")
     page_num = int(main_div.find_all('a', "page-numbers")[3].text)
 
     return page_num
 
 def parse(html):
-    soup = BeautifulSoup(html)
+    soup = BeautifulSoup(html, features="html5lib")
     main_div = soup.find('div', id = "main")
     rows = main_div.find_all('div', class_ = "row row-lttl")
 
@@ -44,15 +45,32 @@ def parse(html):
                 'tags':         [tag.text for tag in article.header.find('div', class_ = 'meta_tags').p.find_all('a')],
                 'discription':  get_discription(get_html(article.header.div.h2.a['href'])),
                 'date':         article.header.li.time.text,
-                'rating':       get_stats(get_html(article.header.div.h2.a['href'])) + ' из 5',
+                'rating':       get_stats(get_html(article.header.div.h2.a['href'])),
             }) 
-    for mod in mods:
-        print(mod)
+    
+    return mods
+
+def save(mods, path):
+    with open(path, 'w') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(('Mod Name', 'Tags', 'Discription', 'Date', 'Rating'))
+
+        for mod in mods:
+            writer.writerow((mod["mod_name"], ','.join(mod["tags"]), mod["discription"], mod["date"], mod["rating"]))
 
 def main():
-    for i in range(1, get_page(get_html("http://lttlword.ru/category/rimworld/mody"))+1):
-        parse(get_html("http://lttlword.ru/category/rimworld/mody/page/" + str(i)))
+    max_page = get_page(get_html("http://lttlword.ru/category/rimworld/mody"))
+    mods = []
+    print('Всего страниц найдено: {}'.format(max_page))
+    for page in range(1, 3):
+        print("Парсинг {}%".format(page  / max_page * 100))
+        mods.extend(parse(get_html("http://lttlword.ru/category/rimworld/mody/page/" + str(page))))
     
+    print("Парсинг завершен!")
+
+    save(mods, 'mods.csv')
+
+    print('Готово!')
 
 if __name__ == '__main__':
     main()

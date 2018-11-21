@@ -8,9 +8,13 @@ def get_html(url):
 
 def parse(html):
     soup = BeautifulSoup(html)
+    main_div = soup.find('div', id = "main")
+    rows = main_div.find_all('div', class_ = "row row-lttl")
+    for row in rows:
+        print(row.prettify())
 
 def main():
-    print(get_html("http://lttlword.ru/tag/rimworld-v1/"))
+    parse(get_html("http://lttlword.ru/tag/rimworld-v1/"))
 
 if __name__ == '__main__':
     main()

@@ -22,7 +22,12 @@ def get_stats(html):
     stats = li.find_all('strong')[1].text
     return stats
 
+def get_page(html):
+    soup = BeautifulSoup(html)
+    main_div = soup.find('div', id = "main")
+    page_num = int(main_div.find_all('a', "page-numbers")[3].text)
 
+    return page_num
 
 def parse(html):
     soup = BeautifulSoup(html)
@@ -45,7 +50,9 @@ def parse(html):
         print(mod)
 
 def main():
-    parse(get_html("http://lttlword.ru/category/rimworld/mody"))
+    for i in range(1, get_page(get_html("http://lttlword.ru/category/rimworld/mody"))+1):
+        parse(get_html("http://lttlword.ru/category/rimworld/mody/page/" + str(i)))
+    
 
 if __name__ == '__main__':
     main()

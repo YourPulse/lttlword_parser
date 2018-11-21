@@ -9,9 +9,18 @@ def get_html(url):
 def parse(html):
     soup = BeautifulSoup(html)
     main_div = soup.find('div', id = "main")
-    elements = main_div.find_all('div', class_ = "col-sm-12 col-md-6 col-xs-120")
-    for element in elements:
-        print(element.prettify())
+    rows = main_div.find_all('div', class_ = "row row-lttl")
+
+    mods = []
+
+    for row in rows:
+        articles = row.find_all('article')
+        for article in articles:
+            mods.append({
+                'mod_name': article.header.div.h2.a.text 
+
+            })
+    print(mods)
 
 def main():
     parse(get_html("http://lttlword.ru/tag/rimworld-v1/"))

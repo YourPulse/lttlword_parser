@@ -2,10 +2,13 @@ from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup
 import csv
 
+
+
 def get_html(url):
     req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
     response = urlopen(req)
     return response.read()
+
 
 def get_discription(html):
     soup = BeautifulSoup(html, features="html5lib")
@@ -35,8 +38,10 @@ def parse(html):
     main_div = soup.find('div', id = "main")
     rows = main_div.find_all('div', class_ = "row row-lttl")
 
-    mods = []
 
+
+    mods = []
+    i = 1
     for row in rows:
         articles = row.find_all('article')
         for article in articles:
@@ -46,7 +51,9 @@ def parse(html):
                 'discription':  get_discription(get_html(article.header.div.h2.a['href'])),
                 'date':         article.header.li.time.text,
                 'rating':       get_stats(get_html(article.header.div.h2.a['href'])),
-            }) 
+            })
+        print(i)
+        i+=1
     
     return mods
 
@@ -59,11 +66,12 @@ def save(mods, path):
             writer.writerow((mod["mod_name"], ','.join(mod["tags"]), mod["discription"], mod["date"], mod["rating"]))
 
 def main():
-    max_page = get_page(get_html("http://lttlword.ru/category/rimworld/mody"))
+    #max_payne = get_page(get_html("http://lttlword.ru/category/rimworld/mody"))
+    max_payne = 10
     mods = []
-    print('Всего страниц найдено: {}'.format(max_page))
-    for page in range(1, max_page):
-        print("Парсинг {}%".format(page  / max_page * 100))
+    print('Всего страниц найдено: {}'.format(max_payne))
+    for page in range(1, max_payne):
+        print("Парсинг {}%".format(page  / max_payne * 100))
         mods.extend(parse(get_html("http://lttlword.ru/category/rimworld/mody/page/" + str(page))))
     
     print("Парсинг завершен!")
@@ -74,3 +82,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

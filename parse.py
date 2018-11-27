@@ -67,7 +67,7 @@ def save(mods, path):
 
 def main():
     #max_payne = get_page(get_html("http://lttlword.ru/category/rimworld/mody"))
-    max_payne = 10
+    max_payne = 40
     mods = []
     print('Всего страниц найдено: {}'.format(max_payne))
     for page in range(1, max_payne):
@@ -82,4 +82,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
